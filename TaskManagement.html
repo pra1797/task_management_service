@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    button {
+      cursor: pointer;
+    }
+  </style>
+  <title>Task Management System</title>
+</head>
+<body>
+
+  <h2>Task Management System</h2>
+
+  <form id="taskForm">
+    <label for="name">Task Name:</label>
+    <input type="text" id="name" placeholder = "Enter task name" required>
+    <label for="description">Description:</label>
+    <input type="text" id="description" placeholder = "Enter task description" required>
+    <label for="assign">Assign:</label>
+    <input type="text" id="assign" placeholder = "Enter assignee email" required>
+    <button type="button" onclick="createRecord()">Create Task</button>
+  </form>
+
+  <table id="recordsTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Assigned To</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="recordsBody"></tbody>
+  </table>
+
+  <script>
+
+    const API_URL = 'http://localhost:8080/task';
+
+    // Function to create a new task
+    function createRecord() {
+      let name = document.getElementById('name').value;
+      let description = document.getElementById('description').value;
+      let assign = document.getElementById('assign').value;
+      fetch(API_URL + '/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+	    "taskName": name,
+	    "description": description,
+	    "assignTo": assign
+	}),
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Refresh the table after creating a task
+        taskForm.reset();
+        fetchTasks();
+      })
+      .catch(error => console.error('Error:', error));
+    }
+
+    // Function to fetch all records
+    function fetchTasks() {
+      fetch(API_URL + '/getAllTask')
+      .then(response => response.json())
+      .then(data => {
+      	console.log("Records:", data.content);
+        const recordsBody = document.getElementById('recordsBody');
+        recordsBody.innerHTML = '';
+
+        data.content.forEach(record => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${record.id}</td>
+            <td>${record.taskName}</td>
+            <td>${record.description}</td>
+            <td>${record.assignTo}</td>
+            <td>
+              <button onclick="updateTasks(${record.id})">Update</button>
+              <button onclick="deleteTasks(${record.id})">Delete</button>
+            </td>
+          `;
+          recordsBody.appendChild(row);
+        });
+      })
+      .catch(error => console.error('Error:', error));
+    }
+
+    // Function to update a record
+    function updateTasks(id) {
+    
+        fetch(`${API_URL}/${id}`, {
+          method: 'GET',
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Get by id:",data);
+          const name = prompt('Update name:',data.taskName);
+          const description = prompt('Update description:',data.description);
+          const assignTo = prompt('Update assignTo:',data.assignTo);
+	      if (name !== null) {
+		fetch(`${API_URL}/${id}`, {
+		  method: 'PUT',
+		  headers: {
+		    'Content-Type': 'application/json',
+		  },
+		  body: JSON.stringify({ "taskName": name,
+		    "description": description,
+		    "assignTo": assignTo}),
+		})
+		.then(response => response.json())
+		.then(data => {
+		  // Refresh the table after updating a task
+		  fetchTasks();
+		})
+		.catch(error => console.error('Error:', error));
+	      }
+        })
+        .catch(error => console.error('Error:', error));
+      
+      
+    }
+
+    // Function to delete a record
+    function deleteTasks(id) {
+    console.log("Deleting recored id:",id);
+      const confirmation = confirm('Are you sure you want to delete this task?');
+      if (confirmation) {
+        fetch(`${API_URL}/${id}`, {
+          method: 'DELETE',
+        })
+        .then(data => {
+          // Refresh the table after deleting a record
+          fetchTasks();
+        })
+        .catch(error => console.error('Error:', error));
+      }
+    }
+
+    // Initial fetch of records when the page loads
+    fetchTasks();
+  </script>
+
+</body>
+</html>
