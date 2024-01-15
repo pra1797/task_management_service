@@ -22,9 +22,9 @@ That will show you a list of endpoints and all their related info (request/respo
 Current Swagger config is taking all endpoints declared on
  com.task.management
  
-Unit testing with DBUnit:
+Unit testing:
   Unit test can run as junit by right clickig on seprate test case of file. 
 
-To use access the UI:
+To access the UI:
   Open the TaskManagement.html file in browser.
 
