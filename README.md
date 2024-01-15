@@ -2,7 +2,7 @@ Application to support handling the task operations like 'create'
 
 Dependencies
  Maven
- Sprig Boot :- Spring version: 3.2.1, java version: 17
+ Sprig Boot : Spring version: 3.2.1, java version: 17
  mySQL
  
 Set up:
@@ -11,7 +11,7 @@ Set up:
  DB password : 'password'
 
 Database Changes:
-Database changeset are executed on application startup.
+  Database changeset are executed on application startup.
 
 To run the code:
   Build the code with 'clean install' command and run as spring application
@@ -23,7 +23,7 @@ Current Swagger config is taking all endpoints declared on
  com.task.management
  
 Unit testing with DBUnit:
-Unit test can run as junit by right clickig on seprate test case of file. 
+  Unit test can run as junit by right clickig on seprate test case of file. 
 
 To use access the UI:
   Open the TaskManagement.html file in browser.
